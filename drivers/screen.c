@@ -30,7 +30,6 @@ static void move_cursor()
     // screen width is 80
     uint16_t cursor_loc = cursor_y * 80 + cursor_x;
 
-
     port_byte_out(REG_VGA_INDEX, 14); // the higher part of the cursor location
     port_byte_out(REG_VGA_DATA, cursor_loc >> 8); // the higher 8-bit
     port_byte_out(REG_VGA_INDEX, 15); // the lower part of the cursor location
