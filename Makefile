@@ -16,7 +16,7 @@ ASM_FLAGS = -f elf -g -F stabs
 all: $(S_OBJECTS) $(C_OBJECTS) link update_image
 
 .c.o:
-	@z "Compiling code files" $< ...
+	@echo "Compiling code files" $< ...
 	$(CC) $(C_FLAGS) $< -o $@
 
 .s.o:
