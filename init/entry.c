@@ -1,4 +1,5 @@
 #include "types.h"
+#include "screen.h"
 
 int kern_entry()
 {
@@ -22,5 +23,6 @@ int kern_entry()
     *input++ = 'e'; *input++ = color;
     *input++ = 'l'; *input++ = color;
     *input++ = '!'; *input++ = color;
+    
     return 0;
 }
