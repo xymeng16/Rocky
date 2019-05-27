@@ -53,3 +53,6 @@ dkms.conf
 
 # VS Code
 .vscode/
+
+# Rocky Kernel
+rocky_kernel
