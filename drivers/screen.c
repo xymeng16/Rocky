@@ -24,6 +24,9 @@ static uint8_t cursor_y = 0;
 // the VGA memory address
 static uint16_t *video_mem_addr = (uint16_t *)0xB8000;
 
+// hex-dec mapping array
+char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
 // move the cursor to the cursor_loc
 static void move_cursor()
 {
@@ -76,8 +79,8 @@ void cputc_c(char c, real_color_t bgc, real_color_t fgc)
 {
     // screen width is 80
     uint16_t cursor_loc = cursor_y * 80 + cursor_x;
-    uint8_t attr_byte = ((uint8_t)bgc << 4) | ((uint8_t)fgc & 0x0F);
-
+    uint8_t attr_byte = (((uint8_t)bgc << 4) | ((uint8_t)fgc & 0x0F));
+    uint16_t attr = attr_byte << 8;
     // handle the backspace(0x08), tab(0x09), '\r', '\n' and space
     switch (c)
     {
@@ -101,12 +104,16 @@ void cputc_c(char c, real_color_t bgc, real_color_t fgc)
         default:
             if(c >= ' ')
             {
-                video_mem_addr[cursor_x + cursor_y * 80] = c | attr_byte;
+                video_mem_addr[cursor_x + cursor_y * 80] = c | attr;
                 cursor_x++;
             }
             break;
     }
-
+    if (cursor_x >= 80)
+    {
+        cursor_x = 0;
+        cursor_y++;
+    }
     scroll();
     move_cursor();
 
@@ -115,23 +122,68 @@ void cputc_c(char c, real_color_t bgc, real_color_t fgc)
 // output a string terminated by '\0' to the console, black bgc and white fgc in default
 void cputs(char *s)
 {
-
+    while (*s)
+    {
+        cputc_c(*(s++), rc_black, rc_white);
+    }
 }
 
 // output a string terminated by '\0' with color to the console
 void cputs_c(char *s, real_color_t bgc, real_color_t fgc)
 {
-
+    while (*s)
+    {
+        cputc_c(*(s++), bgc, fgc);
+    }
 }
 
 // output a hexadecimal int value to the console, with color
 void cputhex_c(uint32_t n, real_color_t bgc, real_color_t fgc)
 {
-
+    char n_s[10]={'\0'}; // initialized with zero
+    int digit = 0;
+    int i, tmp;
+    char noZeroes = 1;
+    cputs_c("0x", bgc, fgc);
+	for (i = 28; i >= 0; i -= 4) {
+		tmp = (n >> i) & 0xF;
+		if (tmp == 0 && noZeroes != 0) {
+		      continue;
+		}
+		noZeroes = 0;
+		if (tmp >= 0xA) {
+		      cputc_c(tmp-0xA+'a', bgc, fgc);
+		} else {
+		      cputc_c(tmp+'0', bgc, fgc);
+		}
+	}
 }
 
 // output a decimal int value to the console, with color
 void cputdec_c(uint32_t n, real_color_t bgc, real_color_t fgc)
 {
+	if (n == 0) {
+		cputc_c('0', bgc, fgc);
+		return;
+	}
 
+	uint32_t acc = n;
+	char c[32];
+	int i = 0;
+	while (acc > 0) {
+		c[i] = '0' + acc % 10;
+		acc /= 10;
+		i++;
+	}
+	c[i] = 0;
+
+	char c2[32];
+	c2[i--] = 0;
+
+	int j = 0;
+	while(i >= 0) {
+	      c2[i--] = c[j++];
+	}
+
+	cputs_c(c2, bgc, fgc);
 }

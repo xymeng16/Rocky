@@ -33,11 +33,12 @@ clean:
 
 .PHONY:update_image
 update_image:
-	sudo mount floppy.img /mnt/kernel
+	# mounting image stored in share folder is impossible (can't read superblock error)
+	sudo mount /home/xiangyi/local_Rocky/floppy.img /mnt/kernel # absolute path
 	sudo cp rocky_kernel /mnt/kernel/rocky_kernel
 	sleep 1
 	sudo umount /mnt/kernel
-
+	cp /home/xiangyi/local_Rocky/floppy.img ./
 .PHONY:mount_image
 mount_image:
 	sudo mount floppy.img /mnt/kernel
