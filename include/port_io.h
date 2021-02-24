@@ -1,5 +1,5 @@
-#ifndef INCLUDE_PORT_IO_H_
-#define INCLUDE_PORT_IO_H_
+#ifndef _PORT_IO_H_
+#define _PORT_IO_H_
 
 #include "types.h"
 
